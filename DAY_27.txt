@@ -1,0 +1,128 @@
+1.Write a program to use composite keyed access path in free format RPGLE
+
+ Columns . . . :    1  71            Edit                     NISHANT451/RISSRC 
+ SEU==>                                                                STUDENT1 
+ FMT PF .....A..........T.Name++++++RLen++TDpB......Functions++++++++++++++++++ 
+        *************** Beginning of data ************************************* 
+0001.00      A          R STUREC                                                
+0002.00      A            NAME          20A                                     
+0003.00      A            CLASS          2P 0                                   
+0004.00      A            DIV            1A                                     
+0005.00      A            ROLL           2P 0                                   
+0006.00      A          K CLASS                                                 
+0007.00      A          K DIV                                                   
+0008.00      A          K ROLL                                                  
+        ****************** End of data **************************************** 
+
+
+ Columns . . . :    6  76            Edit                     KARTIKA241/KARSRC 
+ SEU==>                                                                STUDENTR 
+ FMT *   *. 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+. 
+        *************** Beginning of data ************************************* 
+0001.00 **FREE                                                                  
+0002.00       CTL-OPT DFTACTGRP(*NO);                                           
+0003.00       DCL-F STUDENT  DISK USAGE(*INPUT) KEYED;                          
+0004.00       DCL-F STUDENTD WORKSTN SFILE(STUSFL:RRN);                         
+0005.00       DCL-S RRN PACKED(3:0) INZ(*ZEROS);                                
+0006.00       DCL-PR FILL_STUDENT_LIST; // NO RETURN TYPE                       
+0007.00               //  DCL-DS *N;                                            
+0008.00                    *N PACKED(2:0);                                      
+0009.00                    *N CHAR(1);                                          
+0010.00                    *N PACKED(2:0);                                      
+0011.00                 //END-DS;                                               
+0012.00                *N PACKED(1:0);                                          
+0013.00       END-PR;                                                           
+0014.00          DCL-S KEYCNT PACKED(1:0) INZ(2);                               
+0015.00              CLA=5;                                                     
+0016.00              DIV='A';                                                   
+0017.00              ROL=0;                            
+0018.00              FILL_STUDENT_LIST(CLA:DIV:ROL:KEYCNT);                  
+0019.00                   *IN72=*ON;                                         
+0020.00                   DOW NOT *IN03;                                     
+0021.00                      WRITE FOOTER;                                   
+0022.00                      EXFMT STUCTL;                                   
+0023.00                       IF CLA>0 AND DIV=*BLANKS AND ROL=0;            
+0024.00                          KEYCNT=1;                                   
+0025.00                       ENDIF;                                         
+0026.00                       IF CLA>0 AND DIV<>*BLANKS AND ROL=0;           
+0027.00                          KEYCNT=2;                                   
+0028.00                       ENDIF;                                         
+0029.00                       IF CLA>0 AND DIV<>*BLANKS AND ROL>0;           
+0030.00                          KEYCNT=3;                                   
+0031.00                       ENDIF;                                         
+0032.00                       FILL_STUDENT_LIST(CLA:DIV:ROL:KEYCNT);         
+0033.00                   ENDDO;                                             
+0034.00              *INLR=*ON;                                              
+0035.00          DCL-PROC FILL_STUDENT_LIST;                              
+0036.00           DCL-PI *N;                                                    
+0037.00            //DCL-DS KEYDS;                                              
+0038.00                C PACKED(2:0);                                           
+0039.00                D CHAR(1);                                               
+0040.00                R PACKED(2:0);                                           
+0041.00            //END-DS;                                                    
+0042.00             KEYCNT PACKED(1:0);                                         
+0043.00           END-PI;                                                       
+0044.00       DCL-DS STUKEYS;                                                   
+0045.00         CLA  PACKED(2:0);                                               
+0046.00         DIV  CHAR(1);                                                   
+0047.00         ROL  PACKED(2:0);                                               
+0048.00       END-DS;                                                           
+0049.00            CLA=C;                                                       
+0050.00            DIV=D;                                                       
+0051.00            ROL=R;                                                       
+0052.00                   *IN72=*OFF;                                           
+0053.00                   WRITE  STUCTL;  //SUBFILE CLR   
+0054.00                   RRN=0;                                             
+0055.00                   *IN72=*ON;                                         
+0056.00                   SETLL %KDS(STUKEYS:KEYCNT)STUREC;                  
+0057.00                   READE %KDS(STUKEYS:KEYCNT)STUREC;                  
+0058.00                        DOW NOT %EOF;                                 
+0059.00                           RRN+=1;                                    
+0060.00                           WRITE STUSFL;                              
+0061.00                           READE %KDS(STUKEYS:KEYCNT)STUREC;          
+0062.00                        ENDDO;                                        
+0063.00                        *IN71=*ON;                                    
+0064.00                        IF RRN=0;                                     
+0065.00                          *IN71=*OFF;                                 
+0066.00                        ENDIF;                                        
+0067.00                        END-PROC;                                     
+        ****************** End of data **************************************
+
+2.Write a program to replace a word from text using SCANRPL
+
+
+ Columns . . . :    6  76            Edit                     NISHANT451/RISSRC 
+ SEU==>                                                                SCANRPLC 
+ FMT *   *. 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+. 
+        *************** Beginning of data ************************************* 
+0001.00 **FREE                                                                  
+0002.00       DCL-S TXT1 CHAR(50) INZ('NISHANT IS INACTIVE PERSON');            
+0003.00       DCL-S TXT2 CHAR(50);                                              
+0004.00       DCL-S ARY CHAR(15) DIM(10);                                       
+0005.00       DCL-S X INT(5) INZ(1);                                            
+0006.00         TXT2= %SCANRPL('INACTIVE':'INTELLIGENT':TXT1);                  
+0007.00         DSPLY TXT2;                                                     
+0008.00         ARY=%SPLIT(TXT2);                                               
+0009.00         DOW X<=10;                                                      
+0010.00            DSPLY ARY(X);                                                
+0011.00            X+=1;                                                        
+0012.00         ENDDO;                                                          
+0013.00         *INLR=*ON;                                                      
+        ****************** End of data **************************************** 
+
+3.Write a program to run an external command using QCMDEXC in free format
+
+
+ Columns . . . :    6  76            Edit                     NISHANT451/RISSRC
+ SEU==>                                                               PROTOTYPR 
+ FMT *   *. 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+. 
+        *************** Beginning of data ************************************* 
+0001.00 **FREE                                                                  
+0002.00       DCL-PR CMD EXTPGM('QCMDEXC');                                     
+0003.00              *N CHAR(50) CONST;                                         
+0004.00              *N PACKED(15:5) CONST;                                     
+0005.00       END-PR;                                                           
+0006.00       DCL-S STR1 CHAR(100) INZ('CRTSRCPF FILE(KARTIKA241/KRSRC)');      
+0007.00              CMD(STR1:50);  //CALL                                      
+0008.00       *INLR=*ON;                                                        
+        ****************** End of data **************************************** 
